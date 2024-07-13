@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../public/images/logo.png" type="image/x-icon">
+    <title>AMS</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            background-color: rgb(41, 41, 41);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 10px 10px 10px black;
+        }
+        .header h1 {
+            font-weight: bold;
+            font-style: italic;
+            font-size: 30px;
+            color: azure;
+            margin: 0;
+        }
+        .header img {
+            border-radius: 50%;
+            width: 80px;
+            margin-left: 20px;
+        }
+        .header a {
+            color: azure;
+            padding: 0 30px;
+            font-size: 20px;
+            font-family: cursive;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        main {
+            background-color: darkgray;
+            padding: 20px;
+            min-height: 800px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form label {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+        form input {
+            padding: 5px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        form button {
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #presenteesResult {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header">
+            <h1>Attendance Management System</h1>
+            <img src="../public/images/logo.png" alt="Logo">
+            <nav>
+                <a href="/scanner">QR Scanner</a>
+                <a href="/generator">QR Generator</a>
+                <a href="/welcome">Log Out</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <% if (username) { %>
+            <h2>Welcome, <%= username %>!</h2>
+        <% } else { %>
+            <h2>Welcome to the Attendance Management System.</h2>
+        <% } %>
+        <form id="fetchPresenteesForm">
+            <label for="selectedDate">Select a Date:</label>
+            <input type="date" id="selectedDate" required>
+            <button type="submit">Fetch Presentees</button>
+        </form>
+        <div id="presenteesResult"></div>
+    </main>
+    <script>
+        document.getElementById('fetchPresenteesForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            fetchRollNumbers();
+        });
+
+        function fetchRollNumbers() {
+            const selectedDate = document.getElementById('selectedDate').value;
+            const presenteesResultDiv = document.getElementById('presenteesResult');
+
+            fetch(`/getRollNumbers/${selectedDate}`)
+                .then(response => response.json())
+                .then(data => {
+                    const rollNumbers = data.rollNumbers;
+                    if (rollNumbers && rollNumbers.length > 0) {
+                        presenteesResultDiv.innerText = `Presentees for ${selectedDate}: ${rollNumbers.join(', ')}`;
+                    } else {
+                        presenteesResultDiv.innerText = `No presentees found for ${selectedDate}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching presentees:', error);
+                    presenteesResultDiv.innerText = 'Error fetching presentees';
+                });
+        }
+    </script>
+</body>
+</html>
